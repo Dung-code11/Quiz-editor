@@ -1,0 +1,218 @@
+.questionItem {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s;
+  margin-bottom: 16px;
+}
+
+.questionItem:hover {
+  border-color: #cbd5e0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.invalid {
+  border-color: #fc8181;
+  background: #fff5f5;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.number {
+  font-weight: 700;
+  color: #667eea;
+  background: #e9edff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 1em;
+  min-width: 50px;
+  text-align: center;
+}
+
+.nameInput {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.nameInput:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.nameInput::placeholder {
+  color: #a0aec0;
+  font-size: 15px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.expandBtn,
+.moveBtn,
+.duplicateBtn,
+.deleteBtn {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+}
+
+.expandBtn svg,
+.moveBtn svg,
+.duplicateBtn svg,
+.deleteBtn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.expandBtn:hover,
+.moveBtn:hover:not(:disabled),
+.duplicateBtn:hover,
+.deleteBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.expandBtn:hover {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.moveBtn:hover:not(:disabled) {
+  background: #4299e1;
+  color: white;
+  border-color: #4299e1;
+}
+
+.moveBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: #edf2f7;
+}
+
+.moveBtn:disabled svg {
+  color: #a0aec0;
+}
+
+.duplicateBtn:hover {
+  background: #48bb78;
+  color: white;
+  border-color: #48bb78;
+}
+
+.deleteBtn:hover {
+  background: #f56565;
+  color: white;
+  border-color: #f56565;
+}
+
+.details {
+  padding: 24px;
+}
+
+.formGroup {
+  margin-bottom: 24px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 1em;
+}
+
+.optional {
+  color: #a0aec0;
+  font-size: 0.9em;
+  font-weight: normal;
+  margin-left: 8px;
+}
+
+.formGroup textarea {
+  width: 95%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 15px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.formGroup textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.formGroup textarea::placeholder {
+  color: #a0aec0;
+}
+
+.validationMessage {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: #fed7d7;
+  border: 1px solid #fc8181;
+  border-radius: 10px;
+  color: #c53030;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.validationMessage svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+  width: 20px;
+  height: 20px;
+  color: #c53030;
+}
+
+.validationMessage strong {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.validationMessage ul {
+  margin-left: 20px;
+  font-size: 14px;
+}
+
+.validationMessage li {
+  margin: 6px 0;
+  line-height: 1.5;
+}
