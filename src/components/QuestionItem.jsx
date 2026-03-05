@@ -81,15 +81,13 @@ const QuestionItem = ({
             title="Nhân bản"
           >
             <MdContentCopy size={18} />
-            Copy
           </button>
           <button
             onClick={() => onDelete(question.id)}
             className={styles.deleteBtn}
             title="Xóa"
           >
-            <MdDelete size={18} />
-            Xoá
+            <MdDelete size={20} />
           </button>
         </div>
       </div>

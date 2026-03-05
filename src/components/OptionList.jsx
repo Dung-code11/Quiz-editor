@@ -148,7 +148,7 @@ const OptionList = ({
                 disabled={options.length <= 2}
               >
                 <MdDelete size={18} />
-                Xoá
+
               </button>
             </div>
           </div>

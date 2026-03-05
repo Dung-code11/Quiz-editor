@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MdQuiz,
@@ -12,7 +12,12 @@ import {
   MdSave,
   MdArrowDropDown,
   MdCheckCircle,
-  MdFileDownload
+  MdFileDownload,
+  MdList,
+  MdDelete,
+  MdEdit,
+  MdClose,
+  MdVisibility
 } from 'react-icons/md';
 import QuizForm from '../components/QuizForm';
 import styles from '../css/QuizEditor.module.css';
@@ -27,9 +32,37 @@ const QuizEditor = () => {
   const [fileName, setFileName] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [savedQuizzes, setSavedQuizzes] = useState([]);
+  const [showQuizList, setShowQuizList] = useState(false);
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+
+  // Load danh sách quiz từ localStorage khi component mount
+  useEffect(() => {
+    loadSavedQuizzes();
+  }, []);
+
+  const loadSavedQuizzes = () => {
+    try {
+      const quizzes = JSON.parse(localStorage.getItem('savedQuizzes') || '[]');
+      setSavedQuizzes(quizzes);
+    } catch (error) {
+      console.error('Lỗi khi load quiz:', error);
+    }
+  };
 
   const handleGoBack = () => {
     navigate(-1);
+  };
+
+  const resetToWelcome = () => {
+    setQuiz(null);
+    setSelectedQuiz(null);
+    setImportJson('');
+    setFileName('');
+    setError('');
+    setActiveTab('create');
+    setShowQuizList(false);
+    setIsDropdownOpen(false);
   };
 
   const processFile = (file) => {
@@ -124,14 +157,13 @@ const QuizEditor = () => {
       description: '',
       questions: []
     });
+    setSelectedQuiz(null);
+    setShowQuizList(false);
   };
 
   const handleCancel = () => {
     if (quiz && window.confirm('Bạn có chắc muốn hủy? Dữ liệu chưa lưu sẽ mất.')) {
-      setQuiz(null);
-      setImportJson('');
-      setFileName('');
-      setError('');
+      resetToWelcome();
     }
   };
 
@@ -142,30 +174,33 @@ const QuizEditor = () => {
   };
 
   // Validation function
-  const validateQuiz = () => {
-    if (!quiz) return false;
+  const validateQuiz = (quizToValidate) => {
+    if (!quizToValidate) {
+      alert('Không có dữ liệu quiz');
+      return false;
+    }
     
-    if (!quiz.name.trim()) {
+    if (!quizToValidate.name?.trim()) {
       alert('Vui lòng nhập tên Quiz');
       return false;
     }
 
-    if (quiz.questions.length === 0) {
+    if (!quizToValidate.questions || quizToValidate.questions.length === 0) {
       alert('Quiz phải có ít nhất 1 câu hỏi');
       return false;
     }
 
-    for (let i = 0; i < quiz.questions.length; i++) {
-      const q = quiz.questions[i];
-      if (!q.name.trim()) {
+    for (let i = 0; i < quizToValidate.questions.length; i++) {
+      const q = quizToValidate.questions[i];
+      if (!q.name?.trim()) {
         alert(`Câu hỏi ${i + 1}: Tiêu đề không được để trống`);
         return false;
       }
-      if (q.options.length < 2) {
+      if (!q.options || q.options.length < 2) {
         alert(`Câu hỏi ${i + 1}: Cần ít nhất 2 lựa chọn`);
         return false;
       }
-      if (q.correctOptions.length === 0) {
+      if (!q.correctOptions || q.correctOptions.length === 0) {
         alert(`Câu hỏi ${i + 1}: Cần ít nhất 1 đáp án đúng`);
         return false;
       }
@@ -175,26 +210,39 @@ const QuizEditor = () => {
 
   // Save functions
   const handleSaveQuiz = () => {
-    if (!validateQuiz()) return;
+    if (!validateQuiz(quiz)) return;
 
     try {
       const savedQuizzes = JSON.parse(localStorage.getItem('savedQuizzes') || '[]');
       const newQuiz = {
         ...quiz,
-        id: Date.now(),
-        savedAt: new Date().toISOString()
+        id: selectedQuiz?.id || Date.now(),
+        savedAt: !selectedQuiz ? new Date().toISOString() : quiz.savedAt,
+        updatedAt: new Date().toISOString()
       };
-      savedQuizzes.push(newQuiz);
-      localStorage.setItem('savedQuizzes', JSON.stringify(savedQuizzes));
+
+      // Nếu đang edit quiz cũ, thì update, không thì thêm mới
+      let updatedQuizzes;
+      if (selectedQuiz) {
+        updatedQuizzes = savedQuizzes.map(q => 
+          q.id === selectedQuiz.id ? newQuiz : q
+        );
+      } else {
+        updatedQuizzes = [...savedQuizzes, newQuiz];
+      }
+
+      localStorage.setItem('savedQuizzes', JSON.stringify(updatedQuizzes));
+      setSavedQuizzes(updatedQuizzes);
+      
       alert('✅ Lưu Quiz thành công!');
-      setIsDropdownOpen(false);
+      resetToWelcome(); // Quay về màn hình chào
     } catch (error) {
       alert('Lỗi khi lưu Quiz: ' + error.message);
     }
   };
 
   const handleExportOnly = () => {
-    if (!validateQuiz()) return;
+    if (!validateQuiz(quiz)) return;
 
     try {
       const dataStr = JSON.stringify(quiz, null, 2);
@@ -208,25 +256,36 @@ const QuizEditor = () => {
       linkElement.click();
       
       alert('✅ Export Quiz thành công!');
-      setIsDropdownOpen(false);
+      resetToWelcome(); // Quay về màn hình chào
     } catch (error) {
       alert('Lỗi khi export: ' + error.message);
     }
   };
 
   const handleSaveAndExport = () => {
-    if (!validateQuiz()) return;
+    if (!validateQuiz(quiz)) return;
 
     // Lưu vào localStorage
     try {
       const savedQuizzes = JSON.parse(localStorage.getItem('savedQuizzes') || '[]');
       const newQuiz = {
         ...quiz,
-        id: Date.now(),
-        savedAt: new Date().toISOString()
+        id: selectedQuiz?.id || Date.now(),
+        savedAt: !selectedQuiz ? new Date().toISOString() : quiz.savedAt,
+        updatedAt: new Date().toISOString()
       };
-      savedQuizzes.push(newQuiz);
-      localStorage.setItem('savedQuizzes', JSON.stringify(savedQuizzes));
+
+      let updatedQuizzes;
+      if (selectedQuiz) {
+        updatedQuizzes = savedQuizzes.map(q => 
+          q.id === selectedQuiz.id ? newQuiz : q
+        );
+      } else {
+        updatedQuizzes = [...savedQuizzes, newQuiz];
+      }
+
+      localStorage.setItem('savedQuizzes', JSON.stringify(updatedQuizzes));
+      setSavedQuizzes(updatedQuizzes);
     } catch (error) {
       alert('Lỗi khi lưu Quiz: ' + error.message);
       return;
@@ -245,14 +304,60 @@ const QuizEditor = () => {
       linkElement.click();
       
       alert('✅ Lưu và Export Quiz thành công!');
-      setIsDropdownOpen(false);
+      resetToWelcome(); // Quay về màn hình chào
     } catch (error) {
       alert('Lỗi khi export: ' + error.message);
     }
   };
 
+  const handleEditQuiz = (quizItem) => {
+    setSelectedQuiz(quizItem);
+    setQuiz(quizItem);
+    setShowQuizList(false);
+    setActiveTab('create');
+  };
+
+  const handleDeleteQuiz = (id) => {
+    if (window.confirm('Bạn có chắc muốn xóa quiz này?')) {
+      try {
+        const updatedQuizzes = savedQuizzes.filter(q => q.id !== id);
+        localStorage.setItem('savedQuizzes', JSON.stringify(updatedQuizzes));
+        setSavedQuizzes(updatedQuizzes);
+        
+        if (selectedQuiz?.id === id) {
+          setSelectedQuiz(null);
+          setQuiz(null);
+        }
+        
+        alert('✅ Xóa quiz thành công!');
+      } catch (error) {
+        alert('Lỗi khi xóa quiz: ' + error.message);
+      }
+    }
+  };
+
+  const handleViewQuiz = (quizItem) => {
+    setSelectedQuiz(quizItem);
+    setQuiz(quizItem);
+    setShowQuizList(false);
+    setActiveTab('create');
+  };
+
+  // Format date
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Không rõ';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
   // Đóng dropdown khi click ra ngoài
-  React.useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest(`.${styles.dropdownContainer}`)) {
         setIsDropdownOpen(false);
@@ -278,17 +383,34 @@ const QuizEditor = () => {
         <div className={styles.tabButtons}>
           <button 
             className={`${styles.tabButton} ${activeTab === 'create' ? styles.active : ''}`}
-            onClick={() => setActiveTab('create')}
+            onClick={() => {
+              setActiveTab('create');
+              setShowQuizList(false);
+            }}
           >
             <MdAdd size={18} />
             Tạo mới
           </button>
           <button 
             className={`${styles.tabButton} ${activeTab === 'import' ? styles.active : ''}`}
-            onClick={() => setActiveTab('import')}
+            onClick={() => {
+              setActiveTab('import');
+              setShowQuizList(false);
+            }}
           >
             <MdUpload size={18} />
             Import JSON
+          </button>
+          <button 
+            className={`${styles.tabButton} ${showQuizList ? styles.active : ''}`}
+            onClick={() => {
+              setShowQuizList(!showQuizList);
+              setActiveTab('');
+              loadSavedQuizzes();
+            }}
+          >
+            <MdList size={18} />
+            Danh sách Quiz
           </button>
         </div>
 
@@ -359,9 +481,63 @@ const QuizEditor = () => {
             </div>
           </div>
         )}
+
+        {showQuizList && (
+          <div className={styles.quizListSection}>
+            <h3>Danh sách Quiz đã tạo</h3>
+            {savedQuizzes.length === 0 ? (
+              <p className={styles.emptyList}>Chưa có quiz nào được lưu</p>
+            ) : (
+              <div className={styles.quizGrid}>
+                {savedQuizzes.map((q) => (
+                  <div key={q.id} className={styles.quizCard}>
+                    <div className={styles.quizCardHeader}>
+                      <h4>{q.name}</h4>
+                      <span className={styles.questionCount}>
+                        {q.questions?.length || 0} câu hỏi
+                      </span>
+                    </div>
+                    {q.description && (
+                      <p className={styles.quizDescription}>{q.description}</p>
+                    )}
+                    <div className={styles.quizMeta}>
+                      <span className={styles.quizDate}>
+                        {q.updatedAt ? 'Cập nhật: ' : 'Tạo: '}
+                        {formatDate(q.updatedAt || q.savedAt)}
+                      </span>
+                    </div>
+                    <div className={styles.quizCardActions}>
+                      <button 
+                        onClick={() => handleViewQuiz(q)}
+                        className={styles.viewBtn}
+                        title="Xem quiz"
+                      >
+                        <MdVisibility size={18} />
+                      </button>
+                      <button 
+                        onClick={() => handleEditQuiz(q)}
+                        className={styles.editBtn}
+                        title="Chỉnh sửa"
+                      >
+                        <MdEdit size={18} />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteQuiz(q.id)}
+                        className={styles.deleteBtn}
+                        title="Xóa"
+                      >
+                        <MdDelete size={18} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {!quiz ? (
+      {!quiz && !showQuizList ? (
         <div className={styles.welcomeScreen}>
           <MdQuiz size={80} className={styles.welcomeIcon} />
           <h2>Chào mừng đến với Quiz Editor!</h2>
@@ -371,7 +547,7 @@ const QuizEditor = () => {
             Tạo Quiz mới
           </button>
         </div>
-      ) : (
+      ) : showQuizList ? null : (
         <>
           <QuizForm quiz={quiz} onQuizChange={setQuiz} />
           
@@ -387,7 +563,7 @@ const QuizEditor = () => {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
                 <MdSave size={20} />
-                Lưu Quiz
+                {selectedQuiz ? 'Cập nhật Quiz' : 'Lưu Quiz'}
                 <MdArrowDropDown size={20} className={styles.dropdownIcon} />
               </button>
               
@@ -395,8 +571,10 @@ const QuizEditor = () => {
                 <div className={styles.dropdownMenu}>
                   <button onClick={handleSaveQuiz} className={styles.dropdownItem}>
                     <MdSave size={18} />
-                    <span>Chỉ lưu</span>
-                    <small className={styles.itemDesc}>Lưu vào bộ nhớ</small>
+                    <span>{selectedQuiz ? 'Cập nhật' : 'Chỉ lưu'}</span>
+                    <small className={styles.itemDesc}>
+                      {selectedQuiz ? 'Cập nhật vào bộ nhớ' : 'Lưu vào bộ nhớ'}
+                    </small>
                   </button>
                   
                   <button onClick={handleExportOnly} className={styles.dropdownItem}>
@@ -409,8 +587,10 @@ const QuizEditor = () => {
                   
                   <button onClick={handleSaveAndExport} className={`${styles.dropdownItem} ${styles.highlight}`}>
                     <MdCheckCircle size={18} />
-                    <span>Lưu và Export</span>
-                    <small className={styles.itemDesc}>Vừa lưu vừa xuất file</small>
+                    <span>{selectedQuiz ? 'Cập nhật và Export' : 'Lưu và Export'}</span>
+                    <small className={styles.itemDesc}>
+                      {selectedQuiz ? 'Vừa cập nhật vừa xuất file' : 'Vừa lưu vừa xuất file'}
+                    </small>
                   </button>
                 </div>
               )}

@@ -74,7 +74,7 @@
 .moveBtn,
 .duplicateBtn,
 .deleteBtn {
-  width: 42px;
+  width: auto;
   height: 42px;
   border: none;
   border-radius: 10px;
