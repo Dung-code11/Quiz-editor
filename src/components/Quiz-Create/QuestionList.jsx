@@ -1,7 +1,7 @@
 import React from 'react';
 import { MdAdd, MdHelp } from 'react-icons/md';
 import QuestionItem from './QuestionItem';
-import styles from '../css/QuestionList.module.css';
+import styles from '../../css/QuestionList.module.css';
 
 const QuestionList = ({ questions, onQuestionsChange }) => {
   const addQuestion = () => {

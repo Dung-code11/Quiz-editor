@@ -19,7 +19,7 @@ import {
   MdClose,
   MdVisibility
 } from 'react-icons/md';
-import QuizForm from '../components/QuizForm';
+import QuizForm from '../components/Quiz-Create/QuizForm';
 import styles from '../css/QuizEditor.module.css';
 
 const QuizEditor = () => {
@@ -36,7 +36,6 @@ const QuizEditor = () => {
   const [showQuizList, setShowQuizList] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
 
-  // Load danh sách quiz từ localStorage khi component mount
   useEffect(() => {
     loadSavedQuizzes();
   }, []);
@@ -173,7 +172,6 @@ const QuizEditor = () => {
     setError('');
   };
 
-  // Validation function
   const validateQuiz = (quizToValidate) => {
     if (!quizToValidate) {
       alert('Không có dữ liệu quiz');
@@ -208,7 +206,6 @@ const QuizEditor = () => {
     return true;
   };
 
-  // Save functions
   const handleSaveQuiz = () => {
     if (!validateQuiz(quiz)) return;
 
@@ -221,7 +218,6 @@ const QuizEditor = () => {
         updatedAt: new Date().toISOString()
       };
 
-      // Nếu đang edit quiz cũ, thì update, không thì thêm mới
       let updatedQuizzes;
       if (selectedQuiz) {
         updatedQuizzes = savedQuizzes.map(q => 
@@ -234,8 +230,8 @@ const QuizEditor = () => {
       localStorage.setItem('savedQuizzes', JSON.stringify(updatedQuizzes));
       setSavedQuizzes(updatedQuizzes);
       
-      alert('✅ Lưu Quiz thành công!');
-      resetToWelcome(); // Quay về màn hình chào
+      alert('Lưu Quiz thành công!');
+      resetToWelcome(); 
     } catch (error) {
       alert('Lỗi khi lưu Quiz: ' + error.message);
     }
@@ -255,8 +251,8 @@ const QuizEditor = () => {
       linkElement.setAttribute('download', exportFileDefaultName);
       linkElement.click();
       
-      alert('✅ Export Quiz thành công!');
-      resetToWelcome(); // Quay về màn hình chào
+      alert('Export Quiz thành công!');
+      resetToWelcome();
     } catch (error) {
       alert('Lỗi khi export: ' + error.message);
     }
@@ -265,7 +261,6 @@ const QuizEditor = () => {
   const handleSaveAndExport = () => {
     if (!validateQuiz(quiz)) return;
 
-    // Lưu vào localStorage
     try {
       const savedQuizzes = JSON.parse(localStorage.getItem('savedQuizzes') || '[]');
       const newQuiz = {
@@ -291,7 +286,6 @@ const QuizEditor = () => {
       return;
     }
 
-    // Export JSON
     try {
       const dataStr = JSON.stringify(quiz, null, 2);
       const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
@@ -303,7 +297,7 @@ const QuizEditor = () => {
       linkElement.setAttribute('download', exportFileDefaultName);
       linkElement.click();
       
-      alert('✅ Lưu và Export Quiz thành công!');
+      alert('Lưu và Export Quiz thành công!');
       resetToWelcome(); // Quay về màn hình chào
     } catch (error) {
       alert('Lỗi khi export: ' + error.message);
@@ -329,7 +323,7 @@ const QuizEditor = () => {
           setQuiz(null);
         }
         
-        alert('✅ Xóa quiz thành công!');
+        alert('Xóa quiz thành công!');
       } catch (error) {
         alert('Lỗi khi xóa quiz: ' + error.message);
       }
@@ -343,7 +337,6 @@ const QuizEditor = () => {
     setActiveTab('create');
   };
 
-  // Format date
   const formatDate = (dateString) => {
     if (!dateString) return 'Không rõ';
     const date = new Date(dateString);
@@ -356,7 +349,6 @@ const QuizEditor = () => {
     });
   };
 
-  // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest(`.${styles.dropdownContainer}`)) {
@@ -550,8 +542,7 @@ const QuizEditor = () => {
       ) : showQuizList ? null : (
         <>
           <QuizForm quiz={quiz} onQuizChange={setQuiz} />
-          
-          {/* Action buttons at the bottom */}
+  
           <div className={styles.bottomActions}>
             <button onClick={handleCancel} className={styles.cancelBottomBtn}>
               Hủy

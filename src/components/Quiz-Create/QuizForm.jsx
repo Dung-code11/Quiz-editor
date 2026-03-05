@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Info } from 'lucide-react';
 import QuestionList from './QuestionList';
-import styles from '../css/QuizForm.module.css';
+import styles from '../../css/QuizForm.module.css';
 
 const QuizForm = ({ quiz, onQuizChange }) => {
   const [formData, setFormData] = useState({

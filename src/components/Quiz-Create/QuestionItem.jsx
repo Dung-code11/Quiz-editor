@@ -9,7 +9,7 @@ import {
   MdWarning,
 } from "react-icons/md";
 import OptionList from "./OptionList";
-import styles from "../css/QuestionItem.module.css";
+import styles from "../../css/QuestionItem.module.css";
 
 const QuestionItem = ({
   question,
