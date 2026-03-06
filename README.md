@@ -45,6 +45,7 @@ Tính năng chính
     LocalStorage/SessionStorage - Lưu trữ dữ liệu
 
 Các bước cài đặt
+
     1.Clone repository
 
         git clone https://github.com/Dung-code11/Quiz-editor.git
@@ -71,7 +72,9 @@ Các bước cài đặt
         http://localhost:5173
 
 Hướng dẫn sử dụng
+
     Đăng nhập
+
     Sử dụng một trong hai tài khoản demo:
 
     Vai trò |	Email	       |    Mật khẩu
@@ -79,6 +82,7 @@ Hướng dẫn sử dụng
     User	|   user@quiz.com  |	user123
 
 Admin - Tạo quiz
+
     Đăng nhập với tài khoản Admin
 
     Tạo quiz mới:
@@ -97,7 +101,9 @@ Admin - Tạo quiz
     Lưu và Export: Cả hai
 
 User - Làm bài kiểm tra
+
     Đăng nhập với tài khoản User
+
     Chọn quiz từ danh sách
 
     Làm bài:
@@ -114,30 +120,51 @@ User - Làm bài kiểm tra
 Tính năng nổi bật
 
   Quiz Editor (Admin)
+
     Floating Action Button để thêm câu hỏi nhanh
+
     Tự động cuộn đến câu hỏi mới
+
     Sắp xếp câu hỏi bằng nút lên/xuống
+
     Nhân bản câu hỏi
+
     Import/Export JSON
+
     Validation dữ liệu
 
   Quiz Taking (User)
+
     Timer đếm ngược
-    Tự động chuyển câu sau khi trả lờ
+
+    Tự động chuyển câu sau khi trả lời
+
     Đánh dấu câu hỏi để xem lại
+
     Bảng điều hướng câu hỏi
+
     Hiển thị tiến độ
+
     Xác nhận trước khi nộp bài
     
   Quiz Results (User)
+
     Hiển thị điểm số với màu sắc
+
     Thống kê chi tiết
+
     Xem lại từng câu trả lời
+
     So sánh với đáp án đúng
+
     Hỗ trợ câu nhiều đáp án
+
     Tính điểm một phần
 
   Bảo mật
+
     Authentication: Lưu thông tin user trong localStorage
+
     Protected Routes: Kiểm tra quyền truy cập
+
     Role-based access: Phân quyền Admin/User
