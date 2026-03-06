@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LogoutButton from '../components/LogoutButton';
 import {
   MdQuiz,
   MdDownload,
@@ -362,6 +363,7 @@ const QuizEditor = () => {
 
   return (
     <div className={styles.container}>
+      <LogoutButton/>
       <div className={styles.header}>
         <button onClick={handleGoBack} className={styles.backButton}>
           <MdArrowBack size={24} />

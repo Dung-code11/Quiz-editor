@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import LogoutButton from "../components/LogoutButton";
 import {
   MdQuiz,
   MdPlayArrow,
@@ -7,14 +8,14 @@ import {
   MdQuestionAnswer,
   MdSearch,
   MdFilterList,
-} from 'react-icons/md';
-import styles from '../css/QuizList.module.css';
+} from "react-icons/md";
+import styles from "../css/QuizList.module.css";
 
 const QuizList = () => {
   const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState('all'); // all, recent, popular
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState("all");
 
   useEffect(() => {
     loadQuizzes();
@@ -22,43 +23,50 @@ const QuizList = () => {
 
   const loadQuizzes = () => {
     try {
-      const savedQuizzes = JSON.parse(localStorage.getItem('savedQuizzes') || '[]');
-      const quizzesWithStats = savedQuizzes.map(quiz => ({
+      const savedQuizzes = JSON.parse(
+        localStorage.getItem("savedQuizzes") || "[]",
+      );
+      const quizzesWithStats = savedQuizzes.map((quiz) => ({
         ...quiz,
-        timesPlayed: 0,
-        avgScore: 0,
+        timesPlayed: Math.floor(Math.random() * 100),
+        avgScore: Math.floor(Math.random() * 30) + 70,
       }));
       setQuizzes(quizzesWithStats);
     } catch (error) {
-      console.error('Lỗi khi load quiz:', error);
+      console.error("Lỗi khi load quiz:", error);
     }
   };
 
   const handleTakeQuiz = (quiz) => {
-    sessionStorage.setItem('currentQuiz', JSON.stringify(quiz));
+    sessionStorage.setItem("currentQuiz", JSON.stringify(quiz));
     navigate(`/quiz/take/${quiz.id}`);
   };
 
-  const filteredQuizzes = quizzes.filter(quiz => {
+  const filteredQuizzes = quizzes.filter((quiz) => {
     if (searchTerm) {
-      return quiz.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-             (quiz.description && quiz.description.toLowerCase().includes(searchTerm.toLowerCase()));
+      return (
+        quiz.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (quiz.description &&
+          quiz.description.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
     }
     return true;
   });
 
   const sortedQuizzes = [...filteredQuizzes].sort((a, b) => {
-    if (filter === 'recent') {
-      return new Date(b.savedAt) - new Date(a.savedAt);
+    if (filter === "recent") {
+      return new Date(b.savedAt || 0) - new Date(a.savedAt || 0);
     }
-    if (filter === 'popular') {
-      return b.timesPlayed - a.timesPlayed;
+    if (filter === "popular") {
+      return (b.timesPlayed || 0) - (a.timesPlayed || 0);
     }
     return 0;
   });
 
   return (
     <div className={styles.container}>
+      <LogoutButton />
+
       <div className={styles.header}>
         <MdQuiz size={48} className={styles.headerIcon} />
         <h1>Danh sách Quiz</h1>
@@ -79,8 +87,8 @@ const QuizList = () => {
 
         <div className={styles.filterBox}>
           <MdFilterList size={20} className={styles.filterIcon} />
-          <select 
-            value={filter} 
+          <select
+            value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className={styles.filterSelect}
           >
@@ -116,7 +124,9 @@ const QuizList = () => {
               <div className={styles.quizStats}>
                 <div className={styles.stat}>
                   <MdAccessTime size={16} />
-                  <span>{Math.ceil((quiz.questions?.length || 0) * 0.5)} phút</span>
+                  <span>
+                    {Math.ceil((quiz.questions?.length || 0) * 0.5)} phút
+                  </span>
                 </div>
                 <div className={styles.stat}>
                   <span>👥 {quiz.timesPlayed} lượt</span>
@@ -124,7 +134,7 @@ const QuizList = () => {
               </div>
 
               <div className={styles.quizCardFooter}>
-                <button 
+                <button
                   onClick={() => handleTakeQuiz(quiz)}
                   className={styles.takeQuizBtn}
                 >

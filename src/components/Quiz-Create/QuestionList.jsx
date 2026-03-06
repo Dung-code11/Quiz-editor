@@ -14,6 +14,14 @@ const QuestionList = ({ questions, onQuestionsChange }) => {
       correctOptions: []
     };
     onQuestionsChange([...questions, newQuestion]);
+
+    // Cuộn xuống nút thêm câu hỏi sau khi thêm
+    setTimeout(() => {
+      const addButton = document.getElementById('add-question-btn');
+      if (addButton) {
+        addButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   };
 
   const updateQuestion = (updatedQuestion) => {
@@ -68,6 +76,14 @@ const QuestionList = ({ questions, onQuestionsChange }) => {
       sortOrder: questions.length + 1
     };
     onQuestionsChange([...questions, newQuestion]);
+
+    // Cuộn xuống nút thêm câu hỏi sau khi nhân bản
+    setTimeout(() => {
+      const addButton = document.getElementById('add-question-btn');
+      if (addButton) {
+        addButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   };
 
   const sortedQuestions = [...questions].sort((a, b) => a.sortOrder - b.sortOrder);
@@ -81,33 +97,47 @@ const QuestionList = ({ questions, onQuestionsChange }) => {
             {questions.length} câu hỏi
           </p>
         </div>
-        <button onClick={addQuestion} className={styles.addBtn}>
-          <MdAdd size={18} />
-          Thêm câu hỏi
-        </button>
       </div>
 
       {questions.length === 0 ? (
         <div className={styles.emptyState}>
           <MdHelp size={64} className={styles.emptyIcon} />
           <h4>Chưa có câu hỏi nào</h4>
-          <p>Nhấn nút "Thêm câu hỏi" để bắt đầu</p>
+          <p>Bắt đầu bằng cách thêm câu hỏi đầu tiên</p>
+          <button onClick={addQuestion} className={styles.emptyAddBtn}>
+            <MdAdd size={20} />
+            Thêm câu hỏi đầu tiên
+          </button>
         </div>
       ) : (
-        <div className={styles.container}>
-          {sortedQuestions.map((question, index) => (
-            <QuestionItem
-              key={question.id}
-              question={question}
-              index={index}
-              totalQuestions={questions.length}
-              onUpdate={updateQuestion}
-              onDelete={deleteQuestion}
-              onMove={moveQuestion}
-              onDuplicate={duplicateQuestion}
-            />
-          ))}
-        </div>
+        <>
+          <div className={styles.container}>
+            {sortedQuestions.map((question, index) => (
+              <QuestionItem
+                key={question.id}
+                question={question}
+                index={index}
+                totalQuestions={questions.length}
+                onUpdate={updateQuestion}
+                onDelete={deleteQuestion}
+                onMove={moveQuestion}
+                onDuplicate={duplicateQuestion}
+              />
+            ))}
+          </div>
+
+          {/* Nút thêm câu hỏi ở dưới cùng */}
+          <div className={styles.addButtonContainer}>
+            <button 
+              id="add-question-btn"
+              onClick={addQuestion} 
+              className={styles.bottomAddBtn}
+            >
+              <MdAdd size={20} />
+              Thêm câu hỏi mới
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
